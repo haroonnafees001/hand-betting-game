@@ -34,13 +34,6 @@ export default function GamePage() {
     if (status === "idle") {
       startGame();
     }
-    if (status === "game-over") {
-    saveScore(score);
-  }
-  if (status === "playing") {
-  confirm("Game progress will not be saved. Continue?");
-}
-
   }, [status, startGame]);
 
   const handleExit = () => {
@@ -54,7 +47,11 @@ export default function GamePage() {
   };
 
   const latestResult = history.length ? history[history.length - 1].result : null;
-
+useEffect(() => {
+  if (status === "game-over") {
+    saveScore(score);
+  }
+}, [status, score]);
 
   return (
     <main className="min-h-screen bg-bg text-text px-4 py-6 md:px-6 md:py-8">
