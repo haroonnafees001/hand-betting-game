@@ -236,7 +236,7 @@ export default function GamePage() {
   };
 
   return (
-    <main className="felt-bg min-h-screen px-3 py-3 text-text sm:px-4 sm:py-4 md:px-5 md:py-5 xl:h-[100dvh] xl:overflow-hidden">
+    <main className="felt-bg min-h-screen px-3 py-3 text-text sm:px-4 sm:py-4 md:px-5 md:py-5">
       <div className="mx-auto flex h-full max-w-8xl flex-col">
         <Motion.header
           {...(shouldReduceMotion
@@ -290,7 +290,7 @@ export default function GamePage() {
               {...(shouldReduceMotion
                 ? { initial: false, animate: { opacity: 1 } }
                 : revealMotion)}
-              className="table-panel glow-gold p-4 sm:p-5 md:p-5 xl:flex xl:h-full xl:flex-col"
+              className="table-panel glow-gold border-gold/35 bg-[#10372b]/85 p-4 sm:p-5 md:p-5 xl:flex xl:h-full xl:flex-col"
             >
               <div className="mb-3 flex items-center justify-between gap-3">
                 <div>
@@ -332,14 +332,14 @@ export default function GamePage() {
                 )}
               </div>
 
-              <div className="mb-4 rounded-card border border-border/60 bg-surface2/65 px-3 py-2.5 sm:px-4 sm:py-3">
-                <div className="mb-1.5 flex items-center justify-between text-small uppercase tracking-[0.14em] text-muted">
+              <div className="mb-4 rounded-[28px] border border-gold/35 bg-[#12382b]/90 px-4 py-3 sm:px-5 sm:py-3.5">
+                <div className="mb-2 flex items-center justify-between text-small font-semibold uppercase tracking-[0.14em] text-gold/85">
                   <span>Round Flow</span>
                   <span className="text-gold">{phaseLabelMap[roundPhase]}</span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-[#0a241b]">
+                <div className="h-3 overflow-hidden rounded-full bg-[#0a241b]/95">
                   <Motion.div
-                    className="h-full rounded-full bg-gradient-to-r from-gold/70 to-gold"
+                    className="h-full rounded-full bg-gradient-to-r from-[#d1b45a] via-gold to-[#e6cd81]"
                     animate={{ width: `${phaseProgressMap[roundPhase]}%` }}
                     transition={{
                       duration: shouldReduceMotion ? 0 : TIMING.CLICK_MS / 1000,
@@ -348,16 +348,16 @@ export default function GamePage() {
                 </div>
               </div>
 
-              <div className="relative mt-3 w-full overflow-hidden rounded-[120px] border border-gold/35 bg-gradient-to-b from-[#0b2a20] to-[#071b14] px-3 py-4 shadow-[inset_0_0_35px_rgba(0,0,0,0.45)] sm:rounded-[140px] sm:px-4 sm:py-5 md:rounded-[170px] md:px-6 md:py-7 xl:flex-1">
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_8%,rgba(231,190,92,0.14),transparent_38%)]" />
+              <div className="relative mt-3 w-full overflow-hidden rounded-[120px] border border-gold/35 bg-gradient-to-b from-[#0d2d22] via-[#08241b] to-[#061a14] px-3 py-4 shadow-[inset_0_0_35px_rgba(0,0,0,0.45)] sm:rounded-[140px] sm:px-4 sm:py-5 md:rounded-[170px] md:px-6 md:py-7 xl:flex-1">
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,rgba(231,190,92,0.2),transparent_32%),radial-gradient(circle_at_50%_50%,rgba(38,89,62,0.32),transparent_72%)]" />
 
                 <div className="relative z-10 text-center">
-                  <p className="text-title font-display text-ivory">Current Hand
+                  <p className="text-title font-display text-ivory">
+                    Current Hand
                     <span className="ml-2 text-4xl font-bold text-gold sm:text-5xl md:text-6xl">
-                    {currentHand?.total ?? "--"}
-                  </span>
+                      {currentHand?.total ?? "--"}
+                    </span>
                   </p>
-                  
                 </div>
 
                 <div className="relative z-10 mt-4 sm:mt-5">
@@ -371,6 +371,7 @@ export default function GamePage() {
                     dealerSlots
                     slotCount={5}
                     tileSurface="dealer"
+                    tileSizing="auto"
                   />
                 </div>
                 <div className="relative z-10 mt-3 h-px w-full bg-gradient-to-r from-transparent via-gold/50 to-transparent sm:mt-4" />
@@ -378,7 +379,7 @@ export default function GamePage() {
                   initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.22, delay: 0.05 }}
-                  className="relative z-10 mt-3 rounded-btn border border-gold/45 bg-[#112d22]/90 px-3 py-2 text-center shadow-[0_0_20px_rgba(231,190,92,0.12)] sm:mt-4 sm:px-4"
+                  className="relative z-10 mt-3 rounded-[999px] border border-gold/45 bg-[#102f24]/95 px-4 py-3 text-center shadow-[0_0_20px_rgba(231,190,92,0.12)] sm:mt-4 sm:px-5"
                 >
                   <p className="text-xs uppercase tracking-[0.16em] text-gold">
                     Your Next Move
