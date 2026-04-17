@@ -284,7 +284,7 @@ export default function GamePage() {
           </button>
         </Motion.header>
 
-        <div className="grid gap-4 xl:min-h-0 xl:flex-1 xl:grid-cols-[1.45fr_0.9fr] xl:overflow-hidden">
+        <div className="grid gap-4 xl:min-h-0 xl:flex-1 xl:grid-cols-[1.45fr_0.9fr]">
           <section className="space-y-4 xl:min-h-0 xl:overflow-auto pr-1">
             <Motion.div
               {...(shouldReduceMotion
@@ -374,8 +374,10 @@ export default function GamePage() {
                     tileSizing="auto"
                   />
                 </div>
-                <div className="relative z-10 mt-3 h-px w-full bg-gradient-to-r from-transparent via-gold/50 to-transparent sm:mt-4" />
-                <Motion.div
+               
+              </div>
+                <>
+           <Motion.div
                   initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.22, delay: 0.05 }}
@@ -397,9 +399,11 @@ export default function GamePage() {
                     inline
                   />
                 </div>
-              </div>
+          </>
             </Motion.div>
+           
           </section>
+         
 
           <aside className="space-y-6 xl:min-h-0 xl:overflow-auto pr-1">
             <Motion.div
