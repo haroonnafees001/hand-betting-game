@@ -13,7 +13,7 @@ export default function LandingPage() {
         <div className="grid items-start gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <section className="rounded-card border border-border bg-surface/80 p-6 shadow-card backdrop-blur md:p-8">
             <p className="mb-3 text-small uppercase tracking-[0.28em] text-primary">
-              Premium Assessment Build
+              Game Lobby
             </p>
 
             <h1 className="max-w-3xl text-title font-display leading-tight md:text-hero">
