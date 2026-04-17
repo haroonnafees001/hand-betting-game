@@ -1,0 +1,119 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Source+Sans+3:wght@400;600;700&display=swap");
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-felt-dark text-text font-sans;
+  background-image:
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.08), transparent 52%),
+    radial-gradient(circle at 85% 14%, rgba(255, 255, 255, 0.05), transparent 48%),
+    linear-gradient(145deg, #062017 0%, #0a2c20 38%, #0e3d2d 100%);
+  min-height: 100vh;
+}
+
+.felt-bg {
+  background-image:
+    radial-gradient(circle at 25% 15%, rgba(255, 255, 255, 0.08), transparent 48%),
+    radial-gradient(circle at 88% 4%, rgba(255, 255, 255, 0.04), transparent 36%),
+    repeating-linear-gradient(140deg, rgba(255, 255, 255, 0.02) 0px, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 5px),
+    linear-gradient(145deg, #0c3b2d 0%, #0a2f23 48%, #0b281e 100%);
+}
+
+.table-panel {
+  @apply rounded-card border border-border/70 bg-surface/90 shadow-card shadow-black/40 backdrop-blur;
+}
+
+.cta-hover {
+  transition: transform 0.18s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.cta-hover:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.04);
+}
+
+.cta-hover:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.cta-hover-gold:hover {
+  box-shadow: 0 0 0 1px rgba(231, 190, 92, 0.55), 0 0 20px rgba(231, 190, 92, 0.28);
+}
+
+.cta-hover-danger:hover {
+  box-shadow: 0 0 0 1px rgba(224, 106, 113, 0.55), 0 0 20px rgba(224, 106, 113, 0.25);
+}
+
+.cta-hover-soft:hover {
+  box-shadow: 0 0 0 1px rgba(243, 236, 218, 0.3), 0 0 16px rgba(243, 236, 218, 0.14);
+}
+
+.chip-badge {
+  @apply inline-flex items-center justify-center rounded-full border border-ivory/40 bg-chip-red px-3 py-1 text-small font-semibold text-ivory;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.06), 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.chip-badge-win {
+  border-color: rgba(231, 190, 92, 0.75);
+  background-color: #e7be5c;
+  color: #1f2428;
+}
+
+.chip-badge-lose {
+  border-color: rgba(224, 106, 113, 0.55);
+  background-color: #e06a71;
+  color: #f3ecda;
+}
+
+.chip-badge-draw {
+  border-color: rgba(231, 190, 92, 0.55);
+  background-color: #f3ecda;
+  color: #1f2428;
+}
+
+.glow-gold {
+  box-shadow: 0 0 0 1px rgba(231, 190, 92, 0.45), 0 0 22px rgba(231, 190, 92, 0.25);
+}
+
+.gold-divider {
+  position: relative;
+}
+
+.gold-divider::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -10px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(231, 190, 92, 0.7), transparent);
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -12%;
+  left: var(--x);
+  width: 9px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--hue);
+  opacity: 0;
+  transform: translateY(-20px) rotate(0deg);
+  animation: confetti-fall var(--duration) ease-in var(--delay) forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -14px, 0) rotate(0deg);
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), 330px, 0) rotate(540deg);
+  }
+}

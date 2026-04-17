@@ -5,29 +5,25 @@ export default function ScoreBoard({
   discardPileCount,
   reshuffleCount,
 }) {
+  const stats = [
+    { label: "Score", value: score },
+    { label: "Round", value: round },
+    { label: "Draw", value: drawPileCount },
+    { label: "Discard", value: discardPileCount },
+    { label: "Reshuffle", value: reshuffleCount },
+  ];
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-      
-      <div className="bg-surface border border-border rounded-card p-3">
-        Score: {score}
-      </div>
-
-      <div className="bg-surface border border-border rounded-card p-3">
-        Round: {round}
-      </div>
-
-      <div className="bg-surface border border-border rounded-card p-3">
-        Draw: {drawPileCount}
-      </div>
-
-      <div className="bg-surface border border-border rounded-card p-3">
-        Discard: {discardPileCount}
-      </div>
-
-      <div className="bg-surface border border-border rounded-card p-3">
-        Reshuffle: {reshuffleCount}
-      </div>
-
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+      {stats.map((item) => (
+        <div
+          key={item.label}
+          className="table-panel rounded-card border border-border/70 bg-surface2/85 p-3 text-center"
+        >
+          <p className="text-small uppercase tracking-[0.1em] text-muted">{item.label}</p>
+          <p className="mt-1 text-xl font-semibold text-gold">{item.value}</p>
+        </div>
+      ))}
     </div>
   );
 }

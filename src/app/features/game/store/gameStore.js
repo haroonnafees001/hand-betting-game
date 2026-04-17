@@ -6,6 +6,8 @@ import { resolveBet } from "../engine/resolveBet";
 import { updateDynamicValues } from "../engine/updateDynamicValues";
 import { checkGameOver } from "../engine/checkGameOver";
 
+const DEAL_DURATION_MS = 340;
+
 function buildHand(tiles, dynamicValues) {
   const resolvedTiles = tiles.map((tile) => {
     const resolvedValue =
@@ -39,6 +41,8 @@ const initialState = {
   history: [],
   dynamicValues: {},
   gameOverReason: null,
+  lastRoundResult: null,
+  uiPhase: "idle",
 };
 
 export const useGameStore = create((set, get) => ({
@@ -64,78 +68,109 @@ export const useGameStore = create((set, get) => ({
       history: [],
       dynamicValues,
       gameOverReason: null,
+      lastRoundResult: null,
+      uiPhase: "resolved",
     });
   },
 
   playRound: (bet) => {
     const state = get();
 
-    if (state.status !== "playing" || !state.currentHand) {
+    if (
+      state.status !== "playing" ||
+      !state.currentHand ||
+      state.uiPhase === "dealing"
+    ) {
       return;
     }
 
-    let drawPile = [...state.drawPile];
-    let discardPile = [...state.discardPile];
-    let reshuffleCount = state.reshuffleCount;
+    set({ uiPhase: "dealing" });
 
-    // Agar next hand draw karne ke liye enough tiles nahi hain
-    if (drawPile.length < 2) {
-      const freshDeck = createFreshDeck();
-      drawPile = shuffle([...drawPile, ...discardPile, ...freshDeck]);
-      discardPile = [];
-      reshuffleCount += 1;
-    }
+    const resolveRound = () => {
+      const latest = get();
 
-    const { hand: nextHandTiles, remaining } = drawHand(drawPile, 2);
-    const nextHand = buildHand(nextHandTiles, state.dynamicValues);
+      if (
+        latest.status !== "playing" ||
+        !latest.currentHand ||
+        latest.uiPhase !== "dealing"
+      ) {
+        return;
+      }
 
-    const result = resolveBet(state.currentHand.total, nextHand.total, bet);
+      let drawPile = [...latest.drawPile];
+      let discardPile = [...latest.discardPile];
+      let reshuffleCount = latest.reshuffleCount;
 
-    let nextScore = state.score;
-    let nextDynamicValues = state.dynamicValues;
+      if (drawPile.length < 2) {
+        const freshDeck = createFreshDeck();
+        drawPile = shuffle([...drawPile, ...discardPile, ...freshDeck]);
+        discardPile = [];
+        reshuffleCount += 1;
+      }
 
-    if (result === "win") {
-      nextScore += 1;
-      nextDynamicValues = updateDynamicValues(
-        state.dynamicValues,
-        nextHand.tiles,
-        state.currentHand.tiles
-      );
-    }
+      const { hand: nextHandTiles, remaining } = drawHand(drawPile, 2);
+      const nextHand = buildHand(nextHandTiles, latest.dynamicValues);
 
-    if (result === "lose") {
-      nextDynamicValues = updateDynamicValues(
-        state.dynamicValues,
-        state.currentHand.tiles,
-        nextHand.tiles
-      );
-    }
+      const result = resolveBet(latest.currentHand.total, nextHand.total, bet);
 
-    // draw case me koi dynamic update nahi
-    const gameOverCheck = checkGameOver(nextDynamicValues, reshuffleCount);
+      let nextScore = latest.score;
+      let nextDynamicValues = latest.dynamicValues;
 
-    const newHistoryItem = {
-      round: state.round,
-      bet,
-      previousHand: state.currentHand,
-      nextHand,
-      result,
-      scoreAfterRound: nextScore,
+      if (result === "win") {
+        nextScore += 1;
+        nextDynamicValues = updateDynamicValues(
+          latest.dynamicValues,
+          nextHand.tiles,
+          latest.currentHand.tiles
+        );
+      }
+
+      if (result === "lose") {
+        nextDynamicValues = updateDynamicValues(
+          latest.dynamicValues,
+          latest.currentHand.tiles,
+          nextHand.tiles
+        );
+      }
+
+      const gameOverCheck = checkGameOver(nextDynamicValues, reshuffleCount);
+
+      const newHistoryItem = {
+        round: latest.round,
+        bet,
+        previousHand: latest.currentHand,
+        nextHand,
+        result,
+        scoreAfterRound: nextScore,
+      };
+
+      set({
+        score: nextScore,
+        round: latest.round + 1,
+        reshuffleCount,
+        drawPile: remaining,
+        discardPile: [...discardPile, ...latest.currentHand.tiles],
+        previousHand: latest.currentHand,
+        currentHand: nextHand,
+        history: [...latest.history, newHistoryItem],
+        dynamicValues: nextDynamicValues,
+        status: gameOverCheck.isGameOver ? "game-over" : "playing",
+        gameOverReason: gameOverCheck.reason,
+        lastRoundResult: result,
+        uiPhase: "resolved",
+      });
     };
 
-    set({
-      score: nextScore,
-      round: state.round + 1,
-      reshuffleCount,
-      drawPile: remaining,
-      discardPile: [...discardPile, ...state.currentHand.tiles],
-      previousHand: state.currentHand,
-      currentHand: nextHand,
-      history: [...state.history, newHistoryItem],
-      dynamicValues: nextDynamicValues,
-      status: gameOverCheck.isGameOver ? "game-over" : "playing",
-      gameOverReason: gameOverCheck.reason,
-    });
+    if (typeof window === "undefined") {
+      resolveRound();
+      return;
+    }
+
+    window.setTimeout(resolveRound, DEAL_DURATION_MS);
+  },
+
+  setUiPhase: (phase) => {
+    set({ uiPhase: phase });
   },
 
   exitGame: () => {
