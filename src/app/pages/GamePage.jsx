@@ -300,10 +300,6 @@ export default function GamePage() {
                   <h2 className="mt-1 text-section font-display text-ivory">
                     Dealer Table
                   </h2>
-                  <p className="mt-1 text-sm text-muted">
-                    Predict the next total and choose <span className="font-semibold text-ivory">Higher</span> or{" "}
-                    <span className="font-semibold text-ivory">Lower</span>.
-                  </p>
                 </div>
 
                 {lastRoundResult && (
@@ -378,6 +374,20 @@ export default function GamePage() {
                   />
                 </div>
                 <div className="relative z-10 mt-3 h-px w-full bg-gradient-to-r from-transparent via-gold/50 to-transparent sm:mt-4" />
+                <Motion.div
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.22, delay: 0.05 }}
+                  className="relative z-10 mt-3 rounded-btn border border-gold/45 bg-[#112d22]/90 px-3 py-2 text-center shadow-[0_0_20px_rgba(231,190,92,0.12)] sm:mt-4 sm:px-4"
+                >
+                  <p className="text-xs uppercase tracking-[0.16em] text-gold">
+                    Your Next Move
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-ivory sm:text-base">
+                    Predict the next total and choose <span className="text-gold">Higher</span> or{" "}
+                    <span className="text-gold">Lower</span>.
+                  </p>
+                </Motion.div>
                 <div className="relative z-10 mt-4 flex items-center justify-center sm:mt-5">
                   <BetControls
                     onBet={handleBet}

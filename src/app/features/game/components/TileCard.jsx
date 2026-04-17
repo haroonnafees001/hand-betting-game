@@ -69,7 +69,7 @@ export default function TileCard({
 }) {
   const shouldReduceMotion = useReducedMotion();
   const isDealerSurface = surface === "dealer";
-  const baseRotate = isDealerSurface ? (index % 5 - 2) * 2.4 : 0;
+  const baseRotate = 0;
 
   const dealAnimation = shouldReduceMotion
     ? { opacity: 1 }
@@ -84,6 +84,35 @@ export default function TileCard({
           ease: [0.2, 0.78, 0.25, 1],
         },
       };
+
+  const idleAnimation =
+    !shouldReduceMotion && mode === "current" && uiPhase !== "dealing"
+      ? {
+          opacity: 1,
+          scale: 1,
+          y: [0, -4, 0],
+          rotate: [0, 0, 0],
+          transition: {
+            duration: 2.4,
+            delay: index * 0.12,
+            repeat: Infinity,
+            ease: "easeInOut",
+          },
+        }
+      : null;
+
+  const steadyAnimation = {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    rotate: 0,
+    transition: { duration: 0.2 },
+  };
+
+  const tileAnimation =
+    mode === "current" && uiPhase === "dealing"
+      ? dealAnimation
+      : idleAnimation || steadyAnimation;
 
   const initialState = shouldReduceMotion
     ? { opacity: 0 }
@@ -111,21 +140,16 @@ export default function TileCard({
     <Motion.div
       layout
       initial={initialState}
-      animate={dealAnimation}
+      animate={tileAnimation}
       whileHover={
         shouldReduceMotion
           ? undefined
           : {
               y: -5,
-              rotate: isDealerSurface
-                ? baseRotate + (tile.type === "dragon" ? -1 : 1)
-                : tile.type === "dragon"
-                ? -1
-                : 1,
+              rotate: 0,
               transition: { duration: 0.16 },
             }
       }
-      style={isDealerSurface ? { rotate: `${baseRotate}deg` } : undefined}
       className={`relative flex flex-col items-center justify-center overflow-hidden border border-[#cdbb8d] bg-gradient-to-br from-[#f8f2e5] via-[#eadcb8] to-[#cfbd96] text-chip-black shadow-[0_16px_30px_rgba(0,0,0,0.4)] ${frameClass} ${glowByType[tile.type]}`}
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-white/80 to-transparent" />
