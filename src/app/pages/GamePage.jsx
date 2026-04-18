@@ -11,8 +11,6 @@ import HistoryList from "../features/game/components/HistoryList";
 import ScoreBoard from "../features/game/components/ScoreBoard";
 import { useGameStore } from "../features/game/store/gameStore";
 import { saveScore } from "../features/leaderboard/leaderboardStorage";
-import { playSound, unlockAudio } from "../shared/audio/audioManager";
-import { useAudioSettings } from "../shared/audio/useAudioSettings";
 
 const TIMING = {
   CLICK_MS: 140,
@@ -63,16 +61,9 @@ const phaseLabelMap = {
   settled: "RESULT SETTLE",
 };
 
-function getResultSound(result) {
-  if (result === "win") return "win";
-  if (result === "lose") return "lose";
-  return "draw";
-}
-
 export default function GamePage() {
   const navigate = useNavigate();
   const shouldReduceMotion = useReducedMotion();
-  const { audioMuted, toggleAudioMuted } = useAudioSettings();
 
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
@@ -131,12 +122,6 @@ export default function GamePage() {
   }, [status, score]);
 
   useEffect(() => {
-    if (uiPhase === "dealing") {
-      playSound("deal");
-    }
-  }, [uiPhase]);
-
-  useEffect(() => {
     if (!lastRoundResult || latestRoundNumber === 0) {
       return;
     }
@@ -145,19 +130,10 @@ export default function GamePage() {
       return;
     }
 
-    playSound(getResultSound(lastRoundResult));
-    if (lastRoundResult === "win") {
-      playSound("clap");
-    }
-
     lastHandledResultRoundRef.current = latestRoundNumber;
   }, [lastRoundResult, latestRoundNumber]);
 
   useEffect(() => {
-    if (status === "game-over" && previousStatusRef.current !== "game-over") {
-      playSound("game-over");
-    }
-
     previousStatusRef.current = status;
   }, [status]);
 
@@ -195,43 +171,25 @@ export default function GamePage() {
     playRound(bet);
   };
 
-  const handleBeforeBet = () => {
-    unlockAudio();
-    playSound("click");
-  };
-
-  const handleToggleSound = () => {
-    unlockAudio();
-    playSound("click");
-    toggleAudioMuted();
-  };
-
   const handleOpenHistory = () => {
     if (isHeaderLocked) return;
-    unlockAudio();
-    playSound("click");
     setIsHistoryOpen(true);
   };
 
   const handleCloseHistory = () => {
-    playSound("click");
     setIsHistoryOpen(false);
   };
 
   const handleOpenRules = () => {
     if (isHeaderLocked) return;
-    unlockAudio();
-    playSound("click");
     setIsRulesOpen(true);
   };
 
   const handleCloseRules = () => {
-    playSound("click");
     setIsRulesOpen(false);
   };
 
   const handleCloseWinPopup = () => {
-    playSound("click");
     setDismissedWinRound(latestWinRound);
   };
 
@@ -267,12 +225,6 @@ export default function GamePage() {
               className="cta-hover cta-hover-soft rounded-btn border border-transparent px-4 py-2 text-small font-semibold tracking-[0.14em] text-muted transition hover:border-gold/35 hover:text-ivory disabled:cursor-not-allowed disabled:opacity-45"
             >
               RULES
-            </button>
-            <button
-              onClick={handleToggleSound}
-              className="cta-hover cta-hover-soft rounded-btn border border-transparent px-4 py-2 text-small font-semibold tracking-[0.14em] text-muted transition hover:border-gold/35 hover:text-ivory"
-            >
-              {audioMuted ? "SOUND OFF" : "SOUND ON"}
             </button>
           </nav>
 
@@ -394,7 +346,6 @@ export default function GamePage() {
                 <div className="relative z-10 mt-4 flex items-center justify-center sm:mt-5">
                   <BetControls
                     onBet={handleBet}
-                    onBeforeBet={handleBeforeBet}
                     disabled={status !== "playing" || isRevealLocked}
                     inline
                   />
@@ -485,12 +436,6 @@ export default function GamePage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={handleToggleSound}
-                    className={softButtonClass}
-                  >
-                    {audioMuted ? "Sound Off" : "Sound On"}
-                  </button>
                   <button
                     onClick={handleCloseHistory}
                     className={softButtonClass}
