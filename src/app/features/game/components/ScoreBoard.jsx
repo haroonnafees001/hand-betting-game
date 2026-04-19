@@ -8,8 +8,8 @@ export default function ScoreBoard({
   const stats = [
     { label: "Score", value: score },
     { label: "Round", value: round },
-    { label: "Draw", value: drawPileCount },
-    { label: "Discard", value: discardPileCount },
+    { label: "Remaining Tiles", value: drawPileCount },
+    { label: "Used Tiles", value: discardPileCount },
     { label: "Reshuffle", value: reshuffleCount },
   ];
 
