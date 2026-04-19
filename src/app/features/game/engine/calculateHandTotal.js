@@ -1,4 +1,4 @@
-import { getTileValue } from "./getTileValue";
+import { getTileValue } from "./getTileValue.js";
 
 export function calculateHandTotal(hand, dynamicValues) {
   return hand.reduce((sum, tile) => {
