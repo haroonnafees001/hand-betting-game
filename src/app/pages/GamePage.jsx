@@ -325,21 +325,6 @@ export default function GamePage() {
                 )}
               </div>
 
-              <div className="mb-4 rounded-[28px] border border-gold/35 bg-[#12382b]/90 px-4 py-3 sm:px-5 sm:py-3.5">
-                <div className="mb-2 flex items-center justify-between text-small font-semibold uppercase tracking-[0.14em] text-gold/85">
-                  <span>Round Flow</span>
-                  <span className="text-gold">{phaseLabelMap[roundPhase]}</span>
-                </div>
-                <div className="h-3 overflow-hidden rounded-full bg-[#0a241b]/95">
-                  <Motion.div
-                    className="h-full rounded-full bg-gradient-to-r from-[#d1b45a] via-gold to-[#e6cd81]"
-                    animate={{ width: `${phaseProgressMap[roundPhase]}%` }}
-                    transition={{
-                      duration: shouldReduceMotion ? 0 : TIMING.CLICK_MS / 1000,
-                    }}
-                  />
-                </div>
-              </div>
 
               <div className="relative mt-3 w-full overflow-hidden rounded-[120px] border border-gold/35 bg-gradient-to-b from-[#0d2d22] via-[#08241b] to-[#061a14] px-3 py-4 shadow-[inset_0_0_35px_rgba(0,0,0,0.45)] sm:rounded-[140px] sm:px-4 sm:py-5 md:rounded-[170px] md:px-6 md:py-7 xl:flex-1">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,rgba(231,190,92,0.2),transparent_32%),radial-gradient(circle_at_50%_50%,rgba(38,89,62,0.32),transparent_72%)]" />
