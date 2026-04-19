@@ -25,3 +25,14 @@ Run relevant scenarios for each implemented task.
 ## UX
 1. During `dealing`, verify controls are locked.
 2. Verify result feedback aligns with outcome.
+3. Verify instruction text near `Higher/Lower` remains visible.
+
+## Player Name Flow
+1. First open with no saved name -> popup must appear.
+2. Enter name and start -> game begins and name appears on dealer table.
+3. Exit game -> saved name is removed from localStorage.
+4. Re-open after exit -> popup must appear again.
+
+## Leaderboard
+1. Finish game-over round and verify score saved with entered player name.
+2. Verify popup shows only `Rank`, `Username`, `Points`.

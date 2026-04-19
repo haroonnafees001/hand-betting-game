@@ -1,42 +1,58 @@
 # Task Plan Example (Real)
 
 ## Goal
-Improve GamePage action clarity by making the “next move” instruction highly visible above betting CTAs, without changing gameplay logic.
+Add player-name onboarding flow: show name popup only when needed, save player name, reuse it for leaderboard score entry, and clear it on Exit.
 
 ## Touched Contracts
 - [ ] engine
-- [ ] state
+- [x] state
 - [x] ui
-- [ ] leaderboard
+- [x] leaderboard
 
 ## Implementation Plan
-1. Inspect current Dealer Table section in `GamePage.jsx` and identify where instruction text is currently placed.
-2. Remove low-visibility instruction from header area to avoid duplicate/conflicting guidance.
-3. Add a highlighted instruction capsule directly above `Higher / Lower` controls in dealer table.
-4. Keep CTA order and behavior unchanged; only improve visibility and hierarchy.
-5. Verify mobile spacing so instruction + actions remain visible in first interaction zone.
+1. Add player-name storage helpers in leaderboard module:
+   - `getSavedPlayerName()`
+   - `savePlayerName(name)`
+   - `clearPlayerName()`
+2. Update `GamePage` startup behavior:
+   - if `status === idle` and saved name exists -> auto `startGame()`
+   - if no saved name -> show name popup
+3. Update name popup behavior:
+   - validate non-empty name
+   - save to localStorage
+   - set local state + start game
+4. Update leaderboard save behavior:
+   - on game-over, call `saveScore(score, playerName)`
+5. Update exit behavior:
+   - clear saved player name from localStorage
+   - reset local name state
+   - keep existing exit navigation flow intact
 
 ## Validation Commands
-- `npm run lint -- src/app/pages/GamePage.jsx`
+- `npx eslint src/app/pages/GamePage.jsx src/app/features/leaderboard/leaderboardStorage.js`
+- `npm run test`
+- `npm run build`
 
 ## Scenario Checks
 - Functional checks:
-  - Betting still works for both actions.
-  - Round resolve still updates status/history/score normally.
+  - First open without saved name -> popup appears.
+  - Enter name + start -> game begins and player name visible in dealer table.
+  - Game over saves score with actual player name.
+  - Exit removes saved player name.
 - UX checks:
-  - User can immediately understand next action on first glance.
-  - Instruction remains readable on desktop and mobile.
+  - Popup CTA disabled until valid name is entered.
+  - Returning to game with saved name skips popup and starts directly.
 
 ## Risks / Assumptions
-- Assumption: gameplay rules and state transitions remain untouched.
-- Risk: tighter spacing could reduce readability on very small screens if typography is too large.
+- Assumption: core game rules remain unchanged.
+- Risk: if name persistence is not cleared on all exit paths, stale identity can remain.
 
 ## Done Summary
 - Changed files:
+  - `src/app/features/leaderboard/leaderboardStorage.js`
   - `src/app/pages/GamePage.jsx`
 - Gate status:
   - Functional Gate: Pass (no game rule change)
-  - State Gate: Pass (no state-flow change)
-  - UI Gate: Pass (instruction visibility improved)
-  - QA Gate: Pass (lint + manual visual verification)
-
+  - State Gate: Pass (`uiPhase` flow and dealing lock unaffected)
+  - UI Gate: Pass (name prompt gating and player label visibility)
+  - QA Gate: Pass (lint + test + build)
