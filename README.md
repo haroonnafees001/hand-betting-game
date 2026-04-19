@@ -69,7 +69,6 @@ npm run test
 - `docs/ARCHITECTURE_NOTES.md`
 - `docs/EXTENSION_GUIDE.md`
 - `docs/ASSESSMENT_CHECKLIST.md`
-- `docs/DEMO_SCRIPT.md`
 
 ## Status
 
