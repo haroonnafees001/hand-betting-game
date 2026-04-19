@@ -108,6 +108,13 @@ export default function GamePage() {
 
   const isRevealLocked = isRevealPhase(uiPhase);
   const isHeaderLocked = isRevealLocked;
+  const hasSavedPlayerName = Boolean(playerName.trim());
+
+  useEffect(() => {
+    if (status === "idle" && hasSavedPlayerName) {
+      startGame();
+    }
+  }, [status, hasSavedPlayerName, startGame]);
 
   useEffect(() => {
     if (status === "game-over") {
@@ -402,7 +409,7 @@ export default function GamePage() {
       </div>
 
       <AnimatePresence>
-        {status === "idle" && (
+        {status === "idle" && !hasSavedPlayerName && (
           <Motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
