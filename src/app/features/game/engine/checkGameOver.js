@@ -3,13 +3,8 @@ import {
   EMPTY_GAME_OVER_RESULT,
 } from "../contracts/gameContracts.js";
 
-// Condition 1
-// Agar koi special tile value:
-// • 0 ho jaye
-// • ya 10 ho jaye
-//
-// Condition 2
-// Agar draw pile 3rd time empty ho chuki ho
+
+
 export function checkGameOver(dynamicValues, reshuffleCount) {
   const limitTiles = Object.entries(dynamicValues)
     .filter(([, value]) => value <= 0 || value >= 10)
