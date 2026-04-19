@@ -1,6 +1,6 @@
 # HandBet Game
 
-A casino-style tile betting game where the player predicts whether the next hand total will be **Higher** or **Lower**.
+HandBet is a casino-style tile betting game where the player predicts whether the next hand total will be **Higher** or **Lower**.
 
 ## Highlights
 
@@ -39,21 +39,37 @@ npm run lint
 npm run test
 ```
 
-## Game Rules (Core)
+## How to Play
+
+1. Open the game and enter player name (first time).
+2. Review current hand total.
+3. Choose **Higher** or **Lower**.
+4. Next hand is dealt and result is resolved (`win / lose / draw`).
+5. Score, history, and tile values update every round.
+6. Final score is saved to leaderboard.
+
+## Core Rules
 
 - Number tiles use face value.
-- Winds and Dragons start from dynamic baseline values.
+- Winds and Dragons use dynamic values.
 - Win/Lose updates special tile values.
 - Game ends when:
   - any special tile reaches `0` or `10`, or
-  - reshuffle limit reaches 3.
+  - reshuffle limit reaches `3`.
 
 ## Architecture
 
-- `engine/` -> pure gameplay logic
-- `store/` -> game state + round orchestration
-- `pages/components/` -> UI and interaction layer
+- `src/app/features/game/engine` -> pure gameplay logic
+- `src/app/features/game/store` -> game state + round orchestration
+- `src/app/pages` and `src/app/features/game/components` -> UI and interactions
 - `docs/` -> architecture notes, extension guide, checklist, demo script
+
+## Documentation
+
+- `docs/ARCHITECTURE_NOTES.md`
+- `docs/EXTENSION_GUIDE.md`
+- `docs/ASSESSMENT_CHECKLIST.md`
+- `docs/DEMO_SCRIPT.md`
 
 ## Status
 
