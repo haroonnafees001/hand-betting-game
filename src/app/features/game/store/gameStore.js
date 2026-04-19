@@ -41,6 +41,7 @@ const initialState = {
   history: [],
   dynamicValues: {},
   gameOverReason: null,
+  gameOverTiles: [],
   lastRoundResult: null,
   uiPhase: "idle",
 };
@@ -68,6 +69,7 @@ export const useGameStore = create((set, get) => ({
       history: [],
       dynamicValues,
       gameOverReason: null,
+      gameOverTiles: [],
       lastRoundResult: null,
       uiPhase: "resolved",
     });
@@ -156,6 +158,7 @@ export const useGameStore = create((set, get) => ({
         dynamicValues: nextDynamicValues,
         status: gameOverCheck.isGameOver ? "game-over" : "playing",
         gameOverReason: gameOverCheck.reason,
+        gameOverTiles: gameOverCheck.tiles,
         lastRoundResult: result,
         uiPhase: "resolved",
       });
