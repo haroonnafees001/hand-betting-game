@@ -15,7 +15,9 @@ One-line target outcome.
 3. 
 
 ## Validation Commands
-- `npm run lint -- <touched-files>`
+- `npm run lint`
+- `npm run test` (when engine/store/leaderboard behavior changes)
+- `npm run build` (for release-facing UI changes)
 
 ## Scenario Checks
 - Functional checks:

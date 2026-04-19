@@ -10,6 +10,7 @@ Use this skill for tasks touching:
 - gameplay logic (`engine`, `gameStore`)
 - `GamePage` / `LandingPage`
 - leaderboard behavior
+- player-name onboarding flow
 - assessment/readiness checks
 
 Roman Urdu note: chota task ho ya bara, critical gates skip nahi honge.
@@ -29,9 +30,10 @@ Every task must pass applicable gates:
 - Dealer table remains primary action focus.
 - Next-action instruction near `Higher/Lower` stays visible.
 - Reusable CTA/badge/modal style consistency maintained.
+- If saved player name exists, name popup must not block game start.
 
 4. QA Gate
-- Lint + behavior checks included in task validation.
+- Lint + tests + behavior checks included in task validation.
 
 If any gate fails, task is incomplete.
 
@@ -49,6 +51,8 @@ If any gate fails, task is incomplete.
 ### State Contract
 - `playRound` only when `status=playing` and not dealing.
 - On resolve: update score/history/current/previous/discard + game-over check + `lastRoundResult`.
+- `uiPhase` flow remains: `idle -> dealing -> resolved`.
+- Player-name popup appears only when no saved player name is available.
 
 ### UI Contract
 - Keep casino token language and hierarchy.
@@ -61,6 +65,8 @@ If any gate fails, task is incomplete.
 ### Leaderboard Contract
 - Top-5 behavior stable.
 - Save/load ordering deterministic.
+- Save score with actual player name.
+- Popup columns remain: `Rank`, `Username`, `Points` (no Address).
 
 ## 4) Required Task Sequence
 1. Requirement Lock
@@ -76,7 +82,7 @@ If any gate fails, task is incomplete.
 - Reuse existing patterns first.
 
 5. Validate
-- Run lint + behavior checks.
+- Run lint + tests + behavior checks.
 
 6. Deliver
 - Report changed files + gate status.
@@ -103,10 +109,19 @@ Every task response should include:
 - Touch: all contracts
 - Run all checklists in `templates/`.
 
+### D) Player identity + leaderboard flow
+- Touch: `state`, `ui`, `leaderboard`
+- Must confirm:
+  - name prompt gating logic
+  - localStorage save/remove behavior on start/exit
+  - leaderboard stores actual name
+
 ## 7) Reference Anchors
 - `src/app/features/game/store/gameStore.js`
 - `src/app/features/game/engine/*`
 - `src/app/pages/GamePage.jsx`
 - `src/app/pages/LandingPage.jsx`
+- `src/app/features/leaderboard/leaderboardStorage.js`
 - `src/app/styles/globals.css`
-- `tailwind.config.js`
+- `docs/ARCHITECTURE_NOTES.md`
+- `docs/ASSESSMENT_CHECKLIST.md`

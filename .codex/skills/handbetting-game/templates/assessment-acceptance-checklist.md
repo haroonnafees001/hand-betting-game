@@ -3,12 +3,13 @@
 ## Landing
 - [ ] Clear new game entry point.
 - [ ] Leaderboard shows top 5 scores.
+- [ ] Leaderboard popup columns: `Rank`, `Username`, `Points`.
 
 ## Mechanics
 - [ ] Mahjong tile set includes number, winds, dragons.
 - [ ] Number tile value = face value.
 - [ ] Non-number tiles start at 5 and scale dynamically by outcome.
-- [ ] Draw pile and discard pile counts are visible in game UI.
+- [ ] Remaining Tiles and Used Tiles counts are visible in game UI.
 - [ ] Reshuffle behavior works when draw pile cannot serve next hand.
 
 ## Game Over
@@ -21,9 +22,10 @@
 - [ ] Current hand visuals + total visible.
 - [ ] Previous/history hand view visible.
 - [ ] End-of-game score summary visible.
+- [ ] Name popup appears when no saved player name exists.
+- [ ] Player name visible in dealer-table section after start.
 
 ## Quality
 - [ ] UI polish and transitions are coherent.
 - [ ] Architecture remains extension-ready.
 - [ ] Code remains modular and understandable.
-
