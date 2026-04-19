@@ -1,16 +1,41 @@
-# React + Vite
+# HandBet Game
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+HandBet is a casino-style tile betting game inspired by Mahjong themes.
 
-Currently, two official plugins are available:
+Player predicts whether the **next hand total** will be **Higher** or **Lower** than the current hand total.  
+Special tiles (Winds + Dragons) use dynamic values, and game ends on rule-based conditions.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Game Overview
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Start game from lobby
+- Enter player name (first time)
+- Review current hand total
+- Choose `Higher` or `Lower`
+- Next hand is dealt and result is resolved (`win / lose / draw`)
+- Score, history, and tile values update every round
+- Game over when:
+  - any special tile reaches `0` or `10`, or
+  - reshuffle limit reaches 3
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Tech Stack
+
+- **React 19**
+- **Vite**
+- **Zustand** (state management)
+- **React Router**
+- **Framer Motion** (UI animations)
+- **Tailwind CSS**
+- **ESLint**
+- **Node Test Runner** (`node --test`)
+
+---
+
+## Run Locally
+
+### 1) Install dependencies
+```bash
+npm install
