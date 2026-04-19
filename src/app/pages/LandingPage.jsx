@@ -8,12 +8,6 @@ import { useNavigate } from "react-router-dom";
 import { getLeaderboard } from "../features/leaderboard/leaderboardStorage";
 import AppHeader from "../shared/components/AppHeader";
 
-function shortenWallet(value, index) {
-  const seed = value || `player-${index}`;
-  const normalized = seed.replace(/[^a-zA-Z0-9]/g, "").padEnd(8, "0");
-  return `0x${normalized.slice(0, 4)}...${normalized.slice(-4)}`;
-}
-
 function MahjongIcon({ className = "" }) {
   return (
     <svg
@@ -260,7 +254,7 @@ export default function LandingPage() {
                   : { opacity: 0, y: 16, scale: 0.98 }
               }
               transition={{ duration: 0.24 }}
-              className="table-panel w-full max-w-5xl overflow-hidden p-6 md:p-7"
+              className="table-panel w-full max-w-3xl overflow-hidden p-6 md:p-7"
               onClick={(event) => event.stopPropagation()}
             >
               <div className="mb-5 flex items-center justify-between">
@@ -276,10 +270,9 @@ export default function LandingPage() {
               </div>
 
               <div className="rounded-card border border-border/55 bg-surface2/35 p-3">
-                <div className="grid grid-cols-[70px_1.2fr_1fr_0.8fr] gap-3 px-3 pb-3 text-small uppercase tracking-[0.14em] text-muted">
+                <div className="grid grid-cols-[70px_1.4fr_0.8fr] gap-3 px-3 pb-3 text-small uppercase tracking-[0.14em] text-muted">
                   <p>Rank</p>
                   <p>Username</p>
-                  <p>Address</p>
                   <p className="text-right">Points</p>
                 </div>
 
@@ -292,7 +285,7 @@ export default function LandingPage() {
                     rows.map((item, index) => (
                       <div
                         key={item.id}
-                        className="grid grid-cols-[70px_1.2fr_1fr_0.8fr] items-center gap-3 rounded-card border border-border/45 bg-surface/55 px-3 py-3"
+                        className="grid grid-cols-[70px_1.4fr_0.8fr] items-center gap-3 rounded-card border border-border/45 bg-surface/55 px-3 py-3"
                       >
                         <div className="flex items-center gap-2">
                           <div className="grid h-9 w-9 place-items-center rounded-full border border-gold/45 bg-surface2 font-semibold text-gold">
@@ -302,10 +295,6 @@ export default function LandingPage() {
 
                         <p className="truncate text-body font-semibold text-ivory">
                           {item.name || `Player ${index + 1}`}
-                        </p>
-
-                        <p className="truncate text-body text-muted">
-                          {shortenWallet(item.id, index)}
                         </p>
 
                         <p className="text-right text-body font-semibold text-gold">

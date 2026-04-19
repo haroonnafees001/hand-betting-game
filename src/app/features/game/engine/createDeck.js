@@ -1,4 +1,4 @@
-import { generateId } from "../../../shared/utils/generateId";
+import { generateId } from "../../../shared/utils/generateId.js";
 
 const suits = ["bamboo", "characters", "dots"];
 

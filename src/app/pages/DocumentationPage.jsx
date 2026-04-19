@@ -35,6 +35,12 @@ const gameOverRules = [
   "Draw pile depletion reaches the 3rd reshuffle cycle.",
 ];
 
+const extensionRules = [
+  "New gameplay rules should be implemented in the engine layer first.",
+  "Store should orchestrate flow and keep canonical UI state (uiPhase, gameOverReason, gameOverTiles).",
+  "UI components should stay presentational and consume props from store/page orchestration.",
+];
+
 export default function DocumentationPage() {
   const navigate = useNavigate();
   const shouldReduceMotion = useReducedMotion();
@@ -147,7 +153,7 @@ export default function DocumentationPage() {
                 Deck model: 34 tiles total (27 numbers + 4 winds + 3 dragons).
               </div>
               <div className="rounded-card border border-border/55 bg-surface2/70 px-3 py-2">
-                Draw pile and discard pile counts are visible in scoreboard.
+                Scoreboard labels use simple language: Remaining Tiles and Used Tiles.
               </div>
               <div className="rounded-card border border-border/55 bg-surface2/70 px-3 py-2">
                 If draw pile cannot serve next hand, game reshuffles using
@@ -194,8 +200,29 @@ export default function DocumentationPage() {
             </div>
           </div>
         </Motion.section>
+
+        <Motion.section
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.24, delay: 0.14 }}
+          className="mt-5 table-panel p-5"
+        >
+          <p className="text-small uppercase tracking-[0.18em] text-gold">
+            Extension Architecture
+          </p>
+          <ul className="mt-3 list-disc space-y-2 pl-5 text-body text-muted">
+            {extensionRules.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          <p className="mt-4 text-body text-muted">
+            For detailed engineering docs, see the repository files:
+            <span className="ml-1 font-semibold text-ivory">
+              docs/ARCHITECTURE_NOTES.md, docs/EXTENSION_GUIDE.md, docs/ASSESSMENT_CHECKLIST.md
+            </span>
+          </p>
+        </Motion.section>
       </div>
     </main>
   );
 }
-

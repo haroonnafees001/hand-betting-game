@@ -10,12 +10,20 @@ import HandView from "../features/game/components/HandView";
 import HistoryList from "../features/game/components/HistoryList";
 import ScoreBoard from "../features/game/components/ScoreBoard";
 import { useGameStore } from "../features/game/store/gameStore";
-import { saveScore } from "../features/leaderboard/leaderboardStorage";
+import {
+  clearPlayerName,
+  getSavedPlayerName,
+  savePlayerName,
+  saveScore,
+} from "../features/leaderboard/leaderboardStorage";
 import AppHeader from "../shared/components/AppHeader";
+import {
+  buildGameOverTileValueMap,
+  getGameOverModalDelayMs,
+  isRevealPhase,
+} from "./gamePageViewModel";
 
 const TIMING = {
-  CLICK_MS: 140,
-  DEAL_REVEAL_MS: 340,
   RESULT_SETTLE_MS: 260,
   GAME_OVER_MODAL_DELAY_MS: 900,
 };
@@ -49,20 +57,6 @@ const confettiPieces = Array.from({ length: 26 }, (_, index) => {
   };
 });
 
-const phaseProgressMap = {
-  ready: 5,
-  "bet-placed": 33,
-  revealing: 66,
-  settled: 100,
-};
-
-const phaseLabelMap = {
-  ready: "READY",
-  "bet-placed": "BET PLACED",
-  revealing: "DEAL / REVEAL",
-  settled: "RESULT SETTLE",
-};
-
 function formatTileKey(tileKey) {
   if (!tileKey) return "Special Tile";
   return tileKey.replace(/-/g, " ");
@@ -75,8 +69,9 @@ export default function GamePage() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [dismissedWinRound, setDismissedWinRound] = useState(0);
-  const [isBetPlaced, setIsBetPlaced] = useState(false);
   const [isGameOverModalOpen, setIsGameOverModalOpen] = useState(false);
+  const [playerName, setPlayerName] = useState(() => getSavedPlayerName());
+  const [nameInput, setNameInput] = useState(() => getSavedPlayerName());
 
   const {
     status,
@@ -98,9 +93,6 @@ export default function GamePage() {
     resetGame,
   } = useGameStore();
 
-  const previousStatusRef = useRef(status);
-  const lastHandledResultRoundRef = useRef(0);
-  const betPlacedTimerRef = useRef(null);
   const gameOverModalTimerRef = useRef(null);
 
   const latestRoundNumber = history.length;
@@ -108,53 +100,20 @@ export default function GamePage() {
   const isWinPopupOpen =
     latestWinRound > 0 && dismissedWinRound !== latestWinRound;
   const gameOverTileKeys = gameOverTiles.map((tile) => tile.key);
-  const gameOverTileValueMap = gameOverTiles.reduce((acc, tile) => {
-    acc[tile.key] = tile.value;
-    return acc;
-  }, {});
+  const gameOverTileValueMap = buildGameOverTileValueMap(gameOverTiles);
   const boundaryTile = gameOverTiles[0];
   const hasHighlightedCurrentTile = Boolean(
     currentHand?.tiles?.some((tile) => gameOverTileKeys.includes(tile.key))
   );
 
-  const isRevealLocked = uiPhase === "dealing";
+  const isRevealLocked = isRevealPhase(uiPhase);
   const isHeaderLocked = isRevealLocked;
-  const roundPhase =
-    uiPhase === "dealing"
-      ? "revealing"
-      : isBetPlaced
-        ? "bet-placed"
-        : latestRoundNumber > 0
-          ? "settled"
-          : "ready";
-
-  useEffect(() => {
-    if (status === "idle") {
-      startGame();
-    }
-  }, [status, startGame]);
 
   useEffect(() => {
     if (status === "game-over") {
-      saveScore(score);
+      saveScore(score, playerName || "Player");
     }
-  }, [status, score]);
-
-  useEffect(() => {
-    if (!lastRoundResult || latestRoundNumber === 0) {
-      return;
-    }
-
-    if (lastHandledResultRoundRef.current === latestRoundNumber) {
-      return;
-    }
-
-    lastHandledResultRoundRef.current = latestRoundNumber;
-  }, [lastRoundResult, latestRoundNumber]);
-
-  useEffect(() => {
-    previousStatusRef.current = status;
-  }, [status]);
+  }, [status, score, playerName]);
 
   useEffect(() => {
     if (gameOverModalTimerRef.current) {
@@ -166,8 +125,10 @@ export default function GamePage() {
       return;
     }
 
-    const delay =
-      gameOverTileKeys.length > 0 ? TIMING.GAME_OVER_MODAL_DELAY_MS : 220;
+    const delay = getGameOverModalDelayMs(
+      gameOverTileKeys.length,
+      TIMING.GAME_OVER_MODAL_DELAY_MS
+    );
     gameOverModalTimerRef.current = window.setTimeout(() => {
       setIsGameOverModalOpen(true);
       gameOverModalTimerRef.current = null;
@@ -183,9 +144,6 @@ export default function GamePage() {
 
   useEffect(() => {
     return () => {
-      if (betPlacedTimerRef.current) {
-        window.clearTimeout(betPlacedTimerRef.current);
-      }
       if (gameOverModalTimerRef.current) {
         window.clearTimeout(gameOverModalTimerRef.current);
       }
@@ -194,6 +152,9 @@ export default function GamePage() {
 
   const handleExit = () => {
     setIsGameOverModalOpen(false);
+    clearPlayerName();
+    setPlayerName("");
+    setNameInput("");
     exitGame();
     navigate("/");
   };
@@ -209,14 +170,6 @@ export default function GamePage() {
       return;
     }
 
-    setIsBetPlaced(true);
-    if (betPlacedTimerRef.current) {
-      window.clearTimeout(betPlacedTimerRef.current);
-    }
-    betPlacedTimerRef.current = window.setTimeout(() => {
-      setIsBetPlaced(false);
-      betPlacedTimerRef.current = null;
-    }, TIMING.CLICK_MS);
     playRound(bet);
   };
 
@@ -240,6 +193,15 @@ export default function GamePage() {
 
   const handleCloseWinPopup = () => {
     setDismissedWinRound(latestWinRound);
+  };
+
+  const handleStartGameWithName = () => {
+    const sanitized = nameInput.trim();
+    if (!sanitized) return;
+
+    setPlayerName(sanitized);
+    savePlayerName(sanitized);
+    startGame();
   };
 
   return (
@@ -293,6 +255,9 @@ export default function GamePage() {
                   <h2 className="mt-1 text-section font-display text-ivory">
                     Dealer Table
                   </h2>
+                  <p className="mt-1 inline-flex rounded-btn border border-gold/35 bg-surface2/70 px-3 py-1 text-small font-semibold tracking-[0.08em] text-gold">
+                    Player: {playerName || "Guest"}
+                  </p>
                 </div>
 
                 {lastRoundResult && (
@@ -325,6 +290,21 @@ export default function GamePage() {
                 )}
               </div>
 
+              <Motion.div
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="mb-3 rounded-btn border border-gold/45 bg-[#102f24]/95 px-4 py-3 text-center shadow-[0_0_20px_rgba(231,190,92,0.12)] sm:mb-4 sm:px-5"
+              >
+                <p className="text-xs uppercase tracking-[0.16em] text-gold">
+                  Your Next Move
+                </p>
+                <p className="mt-1 text-sm font-semibold text-ivory sm:text-base">
+                  Predict the next total and choose{" "}
+                  <span className="text-gold">Higher</span> or{" "}
+                  <span className="text-gold">Lower</span>.
+                </p>
+              </Motion.div>
 
               <div className="relative mt-3 w-full overflow-hidden rounded-[120px] border border-gold/35 bg-gradient-to-b from-[#0d2d22] via-[#08241b] to-[#061a14] px-3 py-4 shadow-[inset_0_0_35px_rgba(0,0,0,0.45)] sm:rounded-[140px] sm:px-4 sm:py-5 md:rounded-[170px] md:px-6 md:py-7 xl:flex-1">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,rgba(231,190,92,0.2),transparent_32%),radial-gradient(circle_at_50%_50%,rgba(38,89,62,0.32),transparent_72%)]" />
@@ -349,7 +329,6 @@ export default function GamePage() {
                     dealerSlots
                     slotCount={5}
                     tileSurface="dealer"
-                    tileSizing="auto"
                     highlightTileKeys={gameOverTileKeys}
                     highlightTileValues={gameOverTileValueMap}
                   />
@@ -368,29 +347,9 @@ export default function GamePage() {
                     </div>
                   )}
               </div>
-                <>
-           <Motion.div
-                  initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.22, delay: 0.05 }}
-                  className="relative z-10 mt-3 rounded-[999px] border border-gold/45 bg-[#102f24]/95 px-4 py-3 text-center shadow-[0_0_20px_rgba(231,190,92,0.12)] sm:mt-4 sm:px-5"
-                >
-                  <p className="text-xs uppercase tracking-[0.16em] text-gold">
-                    Your Next Move
-                  </p>
-                  <p className="mt-1 text-sm font-semibold text-ivory sm:text-base">
-                    Predict the next total and choose <span className="text-gold">Higher</span> or{" "}
-                    <span className="text-gold">Lower</span>.
-                  </p>
-                </Motion.div>
-                <div className="relative z-10 mt-4 flex items-center justify-center sm:mt-5">
-                  <BetControls
-                    onBet={handleBet}
-                    disabled={status !== "playing" || isRevealLocked}
-                    inline
-                  />
-                </div>
-          </>
+              <div className="relative z-10 mt-4 flex items-center justify-center sm:mt-5">
+                <BetControls onBet={handleBet} disabled={isRevealLocked} inline />
+              </div>
             </Motion.div>
            
           </section>
@@ -441,6 +400,75 @@ export default function GamePage() {
           </aside>
         </div>
       </div>
+
+      <AnimatePresence>
+        {status === "idle" && (
+          <Motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[80] flex items-end justify-center bg-black/75 p-4 md:items-center"
+          >
+            <Motion.div
+              initial={
+                shouldReduceMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: 18, scale: 0.97 }
+              }
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={
+                shouldReduceMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: 10, scale: 0.98 }
+              }
+              transition={{ duration: 0.24 }}
+              className={`${modalCardClass} w-full max-w-md border-gold/45`}
+            >
+              <div className={modalHeaderClass}>
+                <div>
+                  <p className="text-small uppercase tracking-[0.2em] text-gold">
+                    Welcome
+                  </p>
+                  <h3 className="mt-1 text-section font-display text-ivory">
+                    Enter Player Name
+                  </h3>
+                </div>
+              </div>
+
+              <div className="p-5">
+                <label
+                  htmlFor="player-name"
+                  className="text-small uppercase tracking-[0.16em] text-muted"
+                >
+                  Player Name
+                </label>
+                <input
+                  id="player-name"
+                  value={nameInput}
+                  onChange={(event) => setNameInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      handleStartGameWithName();
+                    }
+                  }}
+                  maxLength={24}
+                  autoFocus
+                  placeholder="Enter your name"
+                  className="mt-2 w-full rounded-btn border border-border/60 bg-surface2 px-3 py-2 text-ivory outline-none transition focus:border-gold/60"
+                />
+
+                <button
+                  onClick={handleStartGameWithName}
+                  disabled={!nameInput.trim()}
+                  className={`${goldButtonClass} mt-4 w-full disabled:cursor-not-allowed disabled:opacity-50`}
+                >
+                  Start Game
+                </button>
+              </div>
+            </Motion.div>
+          </Motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {isHistoryOpen && (
@@ -679,7 +707,7 @@ export default function GamePage() {
                   </button>
                   <button
                     onClick={handleExit}
-                    className="cta-hover cta-hover-soft rounded-btn border border-ivory/30 bg-surface2 px-5 py-2 font-semibold uppercase tracking-[0.12em] text-ivory"
+                    className={`${softButtonClass} px-5 uppercase tracking-[0.12em]`}
                   >
                     Exit Game
                   </button>
