@@ -23,7 +23,20 @@ export default function HandView({
 
   return (
     <section>
-     
+      {title ? (
+        <div className="mb-4 gold-divider pb-2">
+          <h2 className="text-title font-display text-ivory">{title}</h2>
+          {showTotal && (
+            <p className="mt-1 text-lg font-semibold text-gold">Total: {hand.total}</p>
+          )}
+        </div>
+      ) : (
+        showTotal && (
+          <div className="mb-4 gold-divider pb-2">
+            <p className="mt-1 text-xl font-semibold text-gold">Table Total: {hand.total}</p>
+          </div>
+        )
+      )}
 
       <AnimatePresence mode="wait" initial={false}>
         <Motion.div
