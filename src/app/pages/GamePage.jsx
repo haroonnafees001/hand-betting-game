@@ -11,11 +11,13 @@ import HistoryList from "../features/game/components/HistoryList";
 import ScoreBoard from "../features/game/components/ScoreBoard";
 import { useGameStore } from "../features/game/store/gameStore";
 import { saveScore } from "../features/leaderboard/leaderboardStorage";
+import AppHeader from "../shared/components/AppHeader";
 
 const TIMING = {
   CLICK_MS: 140,
   DEAL_REVEAL_MS: 340,
   RESULT_SETTLE_MS: 260,
+  GAME_OVER_MODAL_DELAY_MS: 900,
 };
 
 const revealMotion = {
@@ -61,6 +63,11 @@ const phaseLabelMap = {
   settled: "RESULT SETTLE",
 };
 
+function formatTileKey(tileKey) {
+  if (!tileKey) return "Special Tile";
+  return tileKey.replace(/-/g, " ");
+}
+
 export default function GamePage() {
   const navigate = useNavigate();
   const shouldReduceMotion = useReducedMotion();
@@ -69,6 +76,7 @@ export default function GamePage() {
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [dismissedWinRound, setDismissedWinRound] = useState(0);
   const [isBetPlaced, setIsBetPlaced] = useState(false);
+  const [isGameOverModalOpen, setIsGameOverModalOpen] = useState(false);
 
   const {
     status,
@@ -81,6 +89,7 @@ export default function GamePage() {
     previousHand,
     history,
     gameOverReason,
+    gameOverTiles,
     lastRoundResult,
     uiPhase,
     startGame,
@@ -92,11 +101,21 @@ export default function GamePage() {
   const previousStatusRef = useRef(status);
   const lastHandledResultRoundRef = useRef(0);
   const betPlacedTimerRef = useRef(null);
+  const gameOverModalTimerRef = useRef(null);
 
   const latestRoundNumber = history.length;
   const latestWinRound = lastRoundResult === "win" ? latestRoundNumber : 0;
   const isWinPopupOpen =
     latestWinRound > 0 && dismissedWinRound !== latestWinRound;
+  const gameOverTileKeys = gameOverTiles.map((tile) => tile.key);
+  const gameOverTileValueMap = gameOverTiles.reduce((acc, tile) => {
+    acc[tile.key] = tile.value;
+    return acc;
+  }, {});
+  const boundaryTile = gameOverTiles[0];
+  const hasHighlightedCurrentTile = Boolean(
+    currentHand?.tiles?.some((tile) => gameOverTileKeys.includes(tile.key))
+  );
 
   const isRevealLocked = uiPhase === "dealing";
   const isHeaderLocked = isRevealLocked;
@@ -138,19 +157,49 @@ export default function GamePage() {
   }, [status]);
 
   useEffect(() => {
+    if (gameOverModalTimerRef.current) {
+      window.clearTimeout(gameOverModalTimerRef.current);
+      gameOverModalTimerRef.current = null;
+    }
+
+    if (status !== "game-over") {
+      return;
+    }
+
+    const delay =
+      gameOverTileKeys.length > 0 ? TIMING.GAME_OVER_MODAL_DELAY_MS : 220;
+    gameOverModalTimerRef.current = window.setTimeout(() => {
+      setIsGameOverModalOpen(true);
+      gameOverModalTimerRef.current = null;
+    }, delay);
+
+    return () => {
+      if (gameOverModalTimerRef.current) {
+        window.clearTimeout(gameOverModalTimerRef.current);
+        gameOverModalTimerRef.current = null;
+      }
+    };
+  }, [status, gameOverTileKeys.length]);
+
+  useEffect(() => {
     return () => {
       if (betPlacedTimerRef.current) {
         window.clearTimeout(betPlacedTimerRef.current);
+      }
+      if (gameOverModalTimerRef.current) {
+        window.clearTimeout(gameOverModalTimerRef.current);
       }
     };
   }, []);
 
   const handleExit = () => {
+    setIsGameOverModalOpen(false);
     exitGame();
     navigate("/");
   };
 
   const handleRestart = () => {
+    setIsGameOverModalOpen(false);
     resetGame();
     startGame();
   };
@@ -196,45 +245,37 @@ export default function GamePage() {
   return (
     <main className="felt-bg min-h-screen px-3 py-3 text-text sm:px-4 sm:py-4 md:px-5 md:py-5">
       <div className="mx-auto flex h-full max-w-8xl flex-col">
-        <Motion.header
-          {...(shouldReduceMotion
-            ? { initial: false, animate: { opacity: 1 } }
-            : revealMotion)}
-          className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-card border border-border/55 bg-surface/70 px-3 py-2.5 backdrop-blur sm:mb-4 sm:px-4 sm:py-3"
-        >
-          <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-lg border border-gold/45 bg-surface2 text-xl text-gold">
-              ♠
-            </div>
-            <span className="font-display text-lg tracking-[0.08em] text-ivory">
-              HandBet Club
-            </span>
-          </div>
+        <AppHeader
+          shouldReduceMotion={shouldReduceMotion}
+          className="mb-3 gap-3 px-3 py-2.5 sm:mb-4 sm:px-4 sm:py-3"
+          rightContent={
+            <>
+              <nav className="flex flex-wrap items-center gap-2 md:gap-3">
+                <button
+                  onClick={handleOpenHistory}
+                  disabled={isHeaderLocked}
+                  className="cta-hover cta-hover-soft rounded-btn border border-transparent px-4 py-2 text-small font-semibold tracking-[0.14em] text-muted transition hover:border-gold/35 hover:text-ivory disabled:cursor-not-allowed disabled:opacity-45"
+                >
+                  RECENT RESULTS
+                </button>
+                <button
+                  onClick={handleOpenRules}
+                  disabled={isHeaderLocked}
+                  className="cta-hover cta-hover-soft rounded-btn border border-transparent px-4 py-2 text-small font-semibold tracking-[0.14em] text-muted transition hover:border-gold/35 hover:text-ivory disabled:cursor-not-allowed disabled:opacity-45"
+                >
+                  RULES
+                </button>
+              </nav>
 
-          <nav className="flex flex-wrap items-center gap-2 md:gap-3">
-            <button
-              onClick={handleOpenHistory}
-              disabled={isHeaderLocked}
-              className="cta-hover cta-hover-soft rounded-btn border border-transparent px-4 py-2 text-small font-semibold tracking-[0.14em] text-muted transition hover:border-gold/35 hover:text-ivory disabled:cursor-not-allowed disabled:opacity-45"
-            >
-              RECENT RESULTS
-            </button>
-            <button
-              onClick={handleOpenRules}
-              disabled={isHeaderLocked}
-              className="cta-hover cta-hover-soft rounded-btn border border-transparent px-4 py-2 text-small font-semibold tracking-[0.14em] text-muted transition hover:border-gold/35 hover:text-ivory disabled:cursor-not-allowed disabled:opacity-45"
-            >
-              RULES
-            </button>
-          </nav>
-
-          <button
-            onClick={handleExit}
-            className="cta-hover cta-hover-danger rounded-btn border border-danger/60 bg-gradient-to-b from-danger to-[#8b202a] px-4 py-2 font-semibold text-ivory"
-          >
-            Exit Table
-          </button>
-        </Motion.header>
+              <button
+                onClick={handleExit}
+                className="cta-hover cta-hover-danger rounded-btn border border-danger/60 bg-gradient-to-b from-danger to-[#8b202a] px-4 py-2 font-semibold text-ivory"
+              >
+                Exit Table
+              </button>
+            </>
+          }
+        />
 
         <div className="grid gap-4 xl:min-h-0 xl:flex-1 xl:grid-cols-[1.45fr_0.9fr]">
           <section className="space-y-4 xl:min-h-0 xl:overflow-auto pr-1">
@@ -324,9 +365,23 @@ export default function GamePage() {
                     slotCount={5}
                     tileSurface="dealer"
                     tileSizing="auto"
+                    highlightTileKeys={gameOverTileKeys}
+                    highlightTileValues={gameOverTileValueMap}
                   />
                 </div>
-               
+                {status === "game-over" &&
+                  boundaryTile &&
+                  !hasHighlightedCurrentTile && (
+                    <div className="relative z-10 mt-3 rounded-btn border border-danger/65 bg-danger/15 px-4 py-2 text-center">
+                      <p className="text-xs uppercase tracking-[0.16em] text-danger">
+                        Critical Tile Reached Limit
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-ivory">
+                        {formatTileKey(boundaryTile.key)} ={" "}
+                        <span className="text-danger">{boundaryTile.value}</span>
+                      </p>
+                    </div>
+                  )}
               </div>
                 <>
            <Motion.div
@@ -393,6 +448,8 @@ export default function GamePage() {
                   mode="previous"
                   uiPhase={uiPhase}
                   tileSurface="dealer"
+                  highlightTileKeys={gameOverTileKeys}
+                  highlightTileValues={gameOverTileValueMap}
                 />
               </Motion.div>
             )}
@@ -587,7 +644,7 @@ export default function GamePage() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {status === "game-over" && (
+        {status === "game-over" && isGameOverModalOpen && (
           <Motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -624,7 +681,12 @@ export default function GamePage() {
                 <p className="text-lg font-semibold text-gold">
                   Final Score: {score}
                 </p>
-                <p className="mt-2 text-muted">{gameOverReason}</p>
+                <p className="mt-4 text-small uppercase tracking-[0.16em] text-danger/85">
+                  Reason
+                </p>
+                <p className="mt-1 text-muted">
+                  {gameOverReason || "Game ended due to a rule condition."}
+                </p>
 
                 <div className="mt-6 flex flex-wrap justify-center gap-3">
                   <button onClick={handleRestart} className={goldButtonClass}>

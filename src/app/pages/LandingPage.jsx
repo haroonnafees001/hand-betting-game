@@ -6,6 +6,7 @@ import {
 } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { getLeaderboard } from "../features/leaderboard/leaderboardStorage";
+import AppHeader from "../shared/components/AppHeader";
 
 function shortenWallet(value, index) {
   const seed = value || `player-${index}`;
@@ -57,44 +58,41 @@ export default function LandingPage() {
   );
 
   const rows = leaderboard.slice(0, 5);
+  const topNavItems = [
+    { label: "ABOUT", onClick: () => navigate("/about") },
+    { label: "DOCUMENTATION", onClick: () => navigate("/documentation") },
+  ];
 
   return (
     <main className="felt-bg h-screen overflow-hidden px-4 py-4 text-text md:px-6 md:py-6">
       <div className="mx-auto flex h-full max-w-9xl flex-col">
-        <Motion.header
-          initial={shouldReduceMotion ? false : { opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.26 }}
-          className="mb-4 flex flex-wrap items-center justify-between gap-4 rounded-card border border-border/55 bg-surface/70 px-4 py-3 backdrop-blur"
-        >
-          <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-lg border border-gold/45 bg-surface2 text-xl text-gold">
-              ♠
-            </div>
-            <span className="font-display text-lg tracking-[0.08em] text-ivory">
-              HandBet Club
-            </span>
-          </div>
+        <AppHeader
+          shouldReduceMotion={shouldReduceMotion}
+          className="mb-4"
+          rightContent={
+            <>
+              <nav className="hidden items-center gap-2 md:flex md:gap-3">
+                {topNavItems.map((item) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={item.onClick}
+                    className="cta-hover cta-hover-soft rounded-btn border border-transparent px-4 py-2 text-small tracking-[0.14em] text-muted transition hover:border-gold/35 hover:text-ivory"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </nav>
 
-          <nav className="hidden items-center gap-2 md:flex md:gap-3">
-            {["ABOUT", "DOCUMENTATION", "REWARDS", "TELEGRAM"].map((item) => (
               <button
-                key={item}
-                type="button"
-                className="cta-hover cta-hover-soft rounded-btn border border-transparent px-4 py-2 text-small tracking-[0.14em] text-muted transition hover:border-gold/35 hover:text-ivory"
+                onClick={() => navigate("/game")}
+                className="cta-hover cta-hover-gold rounded-btn border border-gold/55 bg-gradient-to-b from-gold to-[#c4972f] px-5 py-2.5 font-semibold uppercase tracking-[0.12em] text-chip-black"
               >
-                {item}
+                Enter Table
               </button>
-            ))}
-          </nav>
-
-          <button
-            onClick={() => navigate("/game")}
-            className="cta-hover cta-hover-gold rounded-btn border border-gold/55 bg-gradient-to-b from-gold to-[#c4972f] px-5 py-2.5 font-semibold uppercase tracking-[0.12em] text-chip-black"
-          >
-            Enter Table
-          </button>
-        </Motion.header>
+            </>
+          }
+        />
 
         <Motion.section
           initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}

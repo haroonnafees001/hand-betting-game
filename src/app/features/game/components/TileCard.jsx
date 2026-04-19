@@ -66,6 +66,7 @@ export default function TileCard({
   uiPhase = "resolved",
   mode = "current",
   surface = "default",
+  isDanger = false,
 }) {
   const shouldReduceMotion = useReducedMotion();
   const isDealerSurface = surface === "dealer";
@@ -135,12 +136,29 @@ export default function TileCard({
   const typeClass = isDealerSurface
     ? "text-[0.62rem] tracking-[0.18em] sm:text-[0.7rem] sm:tracking-[0.2em] lg:text-[0.78rem] lg:tracking-[0.23em]"
     : "text-small tracking-[0.2em]";
+  const dangerCardClass = isDanger
+    ? "border-danger/75 bg-gradient-to-br from-[#4f171d] via-[#7f1f2b] to-[#a72a3a] text-ivory shadow-[0_0_0_1px_rgba(224,106,113,0.75),0_0_22px_rgba(224,106,113,0.42)]"
+    : "border-[#cdbb8d] bg-gradient-to-br from-[#f8f2e5] via-[#eadcb8] to-[#cfbd96] text-chip-black";
+  const dangerTypeTextClass = isDanger ? "text-ivory/80" : "text-chip-black/60";
+  const dangerValueClass = isDanger ? "text-ivory" : "text-chip-black";
+  const dangerPulse =
+    isDanger && !shouldReduceMotion
+      ? {
+          scale: [1, 1.015, 1],
+          boxShadow: [
+            "0 0 0 1px rgba(224,106,113,0.65), 0 0 18px rgba(224,106,113,0.35)",
+            "0 0 0 1px rgba(224,106,113,0.8), 0 0 28px rgba(224,106,113,0.55)",
+            "0 0 0 1px rgba(224,106,113,0.65), 0 0 18px rgba(224,106,113,0.35)",
+          ],
+          transition: { duration: 1.2, repeat: Infinity, ease: "easeInOut" },
+        }
+      : undefined;
 
   return (
     <Motion.div
       layout
       initial={initialState}
-      animate={tileAnimation}
+      {...(dangerPulse ? { whileTap: { scale: 0.98 } } : {})}
       whileHover={
         shouldReduceMotion
           ? undefined
@@ -150,21 +168,22 @@ export default function TileCard({
               transition: { duration: 0.16 },
             }
       }
-      className={`relative flex flex-col items-center justify-center overflow-hidden border border-[#cdbb8d] bg-gradient-to-br from-[#f8f2e5] via-[#eadcb8] to-[#cfbd96] text-chip-black shadow-[0_16px_30px_rgba(0,0,0,0.4)] ${frameClass} ${glowByType[tile.type]}`}
+      className={`relative flex flex-col items-center justify-center overflow-hidden border shadow-[0_16px_30px_rgba(0,0,0,0.4)] ${frameClass} ${glowByType[tile.type]} ${dangerCardClass}`}
+      animate={dangerPulse || tileAnimation}
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-white/80 to-transparent" />
       <div className="pointer-events-none absolute inset-y-0 right-0 w-[7px] bg-gradient-to-l from-black/22 to-transparent" />
       <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-[7px] bg-gradient-to-t from-black/20 to-transparent" />
       <div className="pointer-events-none absolute inset-[5px] rounded-[8px] border border-white/22" />
 
-      <div className={`relative z-10 flex items-center gap-2 uppercase text-chip-black/60 ${typeClass}`}>
+      <div className={`relative z-10 flex items-center gap-2 uppercase ${dangerTypeTextClass} ${typeClass}`}>
         <span>{tile.type}</span>
         {tile.type === "dragon" && <DragonIcon />}
         {tile.type === "wind" && <WindIcon />}
         {tile.key?.startsWith("bamboo-") && <BambooIcon />}
       </div>
       <div className={`relative z-10 font-semibold capitalize ${labelClass}`}>{tile.label}</div>
-      <div className={`relative z-10 font-bold text-chip-black ${valueClass}`}>{value}</div>
+      <div className={`relative z-10 font-bold ${dangerValueClass} ${valueClass}`}>{value}</div>
     </Motion.div>
   );
 }

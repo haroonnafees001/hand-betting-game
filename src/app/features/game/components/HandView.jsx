@@ -12,6 +12,8 @@ export default function HandView({
   dealerSlots = false,
   slotCount = 5,
   tileSurface = "default",
+  highlightTileKeys = [],
+  highlightTileValues = {},
 }) {
   const shouldReduceMotion = useReducedMotion();
 
@@ -55,11 +57,19 @@ export default function HandView({
               <TileCard
                 key={tile.id}
                 tile={tile}
-                value={tile.resolvedValue}
+                value={
+                  Object.prototype.hasOwnProperty.call(
+                    highlightTileValues,
+                    tile.key
+                  )
+                    ? highlightTileValues[tile.key]
+                    : tile.resolvedValue
+                }
                 index={index}
                 uiPhase={uiPhase}
                 mode={mode}
                 surface={tileSurface}
+                isDanger={highlightTileKeys.includes(tile.key)}
               />
             );
           })}
