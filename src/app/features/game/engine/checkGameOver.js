@@ -3,6 +3,13 @@ import {
   EMPTY_GAME_OVER_RESULT,
 } from "../contracts/gameContracts.js";
 
+// Condition 1
+// if any special card value:
+// • 0 ho jaye
+// • ya 10 ho jaye
+//
+// Condition 2
+// if draw pile become empty on 3rd time empty 
 
 
 export function checkGameOver(dynamicValues, reshuffleCount) {
