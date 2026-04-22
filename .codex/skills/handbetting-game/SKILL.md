@@ -1,8 +1,10 @@
 # HandBetting Game Skill
 
-Purpose: Future-proof workflow for this repo with hard gates for functionality, UI consistency, and QA.
+Purpose: Repo-specific workflow for this project with hard gates for functionality, UI consistency, and QA.
 
 Language style: English + Roman Urdu hints.
+
+Root reference: read `CODEX.md` first for repo truth, then use this skill for task execution flow.
 
 ## 1) When To Use
 Use this skill for tasks touching:
@@ -14,6 +16,13 @@ Use this skill for tasks touching:
 - assessment/readiness checks
 
 Roman Urdu note: chota task ho ya bara, critical gates skip nahi honge.
+
+## 1.5) Operating Order
+1. Read `CODEX.md`.
+2. Identify touched contracts: `engine`, `state`, `ui`, `leaderboard`.
+3. Apply the gates below.
+4. Use templates/references only as needed.
+5. Validate based on the touched contracts.
 
 ## 2) Hard Gates (Non-Negotiable)
 Every task must pass applicable gates:
@@ -33,7 +42,8 @@ Every task must pass applicable gates:
 - If saved player name exists, name popup must not block game start.
 
 4. QA Gate
-- Lint + tests + behavior checks included in task validation.
+- Use validation depth from `CODEX.md`.
+- For broad or risky changes, run `npm run lint`, `npm run test`, and `npm run build`.
 
 If any gate fails, task is incomplete.
 
@@ -75,16 +85,21 @@ If any gate fails, task is incomplete.
 2. Contract Mapping
 - Mark touched contracts: `engine`, `state`, `ui`, `leaderboard`.
 
-3. Plan
+3. Impact Scan
+- Read the current source of truth files before editing.
+- Prefer root anchors from `CODEX.md`.
+
+4. Plan
 - Small decision-complete patch plan.
 
-4. Implement
+5. Implement
 - Reuse existing patterns first.
 
-5. Validate
-- Run lint + tests + behavior checks.
+6. Validate
+- Run the smallest sufficient checks from `CODEX.md`.
+- If multiple contracts are touched, widen validation.
 
-6. Deliver
+7. Deliver
 - Report changed files + gate status.
 
 ## 5) Required Output Structure
@@ -123,5 +138,6 @@ Every task response should include:
 - `src/app/pages/LandingPage.jsx`
 - `src/app/features/leaderboard/leaderboardStorage.js`
 - `src/app/styles/globals.css`
+- `CODEX.md`
 - `docs/ARCHITECTURE_NOTES.md`
 - `docs/ASSESSMENT_CHECKLIST.md`
