@@ -62,7 +62,7 @@ npm run test
 - `src/app/features/game/engine` -> pure gameplay logic
 - `src/app/features/game/store` -> game state + round orchestration
 - `src/app/pages` and `src/app/features/game/components` -> UI and interactions
-- `docs/` -> architecture notes, extension guide, checklist, demo script
+- `docs/` -> architecture notes, extension guide, checklist
 
 ## Documentation
 
