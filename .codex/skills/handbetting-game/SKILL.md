@@ -4,7 +4,7 @@ Purpose: Repo-specific workflow for this project with hard gates for functionali
 
 Language style: English + Roman Urdu hints.
 
-Root reference: read `CODEX.md` first for repo truth, then use this skill for task execution flow.
+Root reference: read `AGENT.md` first for repo truth, then use this skill for task execution flow.
 
 ## 1) When To Use
 Use this skill for tasks touching:
@@ -18,7 +18,7 @@ Use this skill for tasks touching:
 Roman Urdu note: chota task ho ya bara, critical gates skip nahi honge.
 
 ## 1.5) Operating Order
-1. Read `CODEX.md`.
+1. Read `AGENT.md`.
 2. Identify touched contracts: `engine`, `state`, `ui`, `leaderboard`.
 3. Apply the gates below.
 4. Use templates/references only as needed.
@@ -42,7 +42,7 @@ Every task must pass applicable gates:
 - If saved player name exists, name popup must not block game start.
 
 4. QA Gate
-- Use validation depth from `CODEX.md`.
+- Use validation depth from `AGENT.md`.
 - For broad or risky changes, run `npm run lint`, `npm run test`, and `npm run build`.
 
 If any gate fails, task is incomplete.
@@ -87,7 +87,7 @@ If any gate fails, task is incomplete.
 
 3. Impact Scan
 - Read the current source of truth files before editing.
-- Prefer root anchors from `CODEX.md`.
+- Prefer root anchors from `AGENT.md`.
 
 4. Plan
 - Small decision-complete patch plan.
@@ -96,7 +96,7 @@ If any gate fails, task is incomplete.
 - Reuse existing patterns first.
 
 6. Validate
-- Run the smallest sufficient checks from `CODEX.md`.
+- Run the smallest sufficient checks from `AGENT.md`.
 - If multiple contracts are touched, widen validation.
 
 7. Deliver
@@ -138,6 +138,6 @@ Every task response should include:
 - `src/app/pages/LandingPage.jsx`
 - `src/app/features/leaderboard/leaderboardStorage.js`
 - `src/app/styles/globals.css`
-- `CODEX.md`
+- `AGENT.md`
 - `docs/ARCHITECTURE_NOTES.md`
 - `docs/ASSESSMENT_CHECKLIST.md`

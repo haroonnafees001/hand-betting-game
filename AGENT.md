@@ -3,7 +3,7 @@
 This file is the root operating manual for Codex agents working in this repo.
 
 Use it together with `.codex/skills/handbetting-game/SKILL.md`:
-- `CODEX.md` = repo truth, boundaries, invariants, and validation defaults
+- `AGENT.md` = repo truth, boundaries, invariants, and validation defaults
 - `SKILL.md` = task workflow, gates, and delivery structure
 
 ## Project Summary
